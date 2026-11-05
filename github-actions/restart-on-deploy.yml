@@ -1,0 +1,22 @@
+# Copy to .github/workflows/restart-on-deploy.yml in your app repo.
+# Add a repository secret VELOXA_API_KEY (scope: instances:write) and set SERVER_NAME below.
+name: Restart VeloxaHost server after deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SERVER_NAME: web-prod-01
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restart server
+        run: |
+          curl -fsS -X POST "https://console.veloxahost.com/api/v1/instances/${SERVER_NAME}/state" \
+            -H "Authorization: Bearer ${{ secrets.VELOXA_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"action":"restart"}'
